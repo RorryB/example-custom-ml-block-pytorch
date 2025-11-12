@@ -241,7 +241,7 @@ def test(model, loader, criterion, device):
     epoch_acc = correct / total
     return epoch_loss, epoch_acc
 
-training = True
+training = False
 
 if(training):
     # Training loop
@@ -270,9 +270,10 @@ if(training):
             f'Test Loss: {test_loss:.4f}, Test Acc: {test_acc:.4f}')
 
     print(model)
-    import pdb; pdb.set_trace()
 else:
     model = UPA.load_system(model, 'PAI', 'best_model', True)
+
+import pdb; pdb.set_trace()
 
 torch.onnx.export(model.cpu(),
                   torch.randn(tuple([1] + list(X_train.shape[1:]))),
