@@ -435,7 +435,6 @@ def main():
         with torch.no_grad():
             for inputs, labels in loader:
                 inputs, labels = inputs.to(device), labels.to(device)
-                
                 outputs = model(inputs)
                 
                 # Convert one-hot labels to class indices if needed
@@ -459,6 +458,29 @@ def main():
     print(f"test_acc: {test_acc}")
     print(f"params: {param_count}")
     print(f"Dendrite Count: {dendrite_count}")
+    
+    for i, block in enumerate(model.conv_blocks):
+        conv = block[0].main_module
+        if conv.padding == 'same':
+            # Calculate explicit padding
+            if isinstance(conv.kernel_size, tuple):
+                padding = tuple((k - 1) // 2 for k in conv.kernel_size)
+            else:
+                padding = (conv.kernel_size - 1) // 2
+            
+            # Set the explicit padding
+            conv.padding = padding
+            print(f"Updated padding for conv_blocks[{i}][0].main_module to {padding}")
+    
+    torch.onnx.export(model.cpu(),
+                  torch.randn((32, 624)),
+                  os.path.join(args.model_name + '.model.onnx'),
+                  export_params=True,
+                  opset_version=10,
+                  do_constant_folding=True,
+                  input_names=['input'],
+                  output_names=['output'])
+    
 
 if __name__ == "__main__":
     main()
