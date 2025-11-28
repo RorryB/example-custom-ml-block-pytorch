@@ -15,6 +15,9 @@ parser = argparse.ArgumentParser(description='Running custom PyTorch models in E
 parser.add_argument('--data-directory', type=str, required=True)
 parser.add_argument('--epochs', type=int, required=True)
 parser.add_argument('--learning-rate', type=float, required=True)
+parser.add_argument('--dendritic-optimization', type=str, required=False, default="false")
+parser.add_argument('--improved-dendritic-optimization', type=str, required=False, default="false")
+parser.add_argument('--perforated-ai-token', type=str, required=False, default="false")
 parser.add_argument('--out-directory', type=str, required=True)
 
 args, unknown = parser.parse_known_args()
@@ -35,6 +38,14 @@ MODEL_INPUT_SHAPE = X_train.shape[1:]
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print('Training on', device)
 print('')
+
+def str2bool(value: str) -> bool:
+    return str(value).lower() in ("1", "true", "t", "yes", "y")
+
+# INFO: Here are the values of dendritic optimization flags from the GUI
+dendritic_optimization = str2bool(args.dendritic_optimization)
+improved_dendritic_optimization = str2bool(args.improved_dendritic_optimization)
+perforated_ai_token = args.perforated_ai_token
 
 # Small pyTorch neural network with 2 hidden layers
 class Net(nn.Module):

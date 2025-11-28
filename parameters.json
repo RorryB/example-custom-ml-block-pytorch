@@ -22,6 +22,32 @@
             "type": "float",
             "help": "How fast the neural network learns, if the network overfits quickly, then lower the learning rate.",
             "param": "learning-rate"
+        },
+        {
+            "name": "Dendritic Optimization",
+            "value": "false",
+            "type": "boolean",
+            "help": "Controls whether dendritic optimization should be applied.",
+            "param": "dendritic-optimization"
+        },
+        {
+            "name": "Improved Dendritic Optimization",
+            "value": "false",
+            "type": "boolean",
+            "help": "Controls whether improved dendritic optimization should be applied.",
+            "param": "improved-dendritic-optimization"
+        },
+        {
+            "name": "Perforated AI Token",
+            "value": "",
+            "type": "string",
+            "help": "Your PerforatedAI API token.",
+            "param": "perforated-ai-token",
+            "showIf": {
+                "parameter": "improved-dendritic-optimization",
+                "operator": "eq",
+                "value": "true"
+            }
         }
     ]
 }
