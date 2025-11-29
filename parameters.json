@@ -24,7 +24,7 @@
         },
         {
             "name": "Learning rate",
-            "value": "0.01",
+            "value": "0.001",
             "type": "float",
             "help": "How fast the neural network learns, if the network overfits quickly, then lower the learning rate.",
             "param": "learning-rate"
@@ -52,7 +52,7 @@
         },
         {
             "name": "Number of Linear Layers",
-            "value": "1",
+            "value": "2",
             "type": "select",
             "valid": ["1", "2"],
             "configType": "int",
@@ -60,7 +60,7 @@
         },
         {
             "name": "Network Width",
-            "value": "0.5",
+            "value": "2.0",
             "type": "float",
             "param": "network-width",
             "help": "Width multiplier for channels."
@@ -74,7 +74,7 @@
         },
         {
             "name": "Channel Growth Mode",
-            "value": "3",
+            "value": "5",
             "type": "select",
             "valid": ["0", "1", "2", "3", "4", "5"],
             "configType": "int",
@@ -113,7 +113,7 @@
         },
         {
             "name": "Improvement Threshold",
-            "value": "low",
+            "value": "medium",
             "type": "select",
             "valid": ["low", "medium", "high"],
             "showIf": {

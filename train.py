@@ -12,6 +12,7 @@ from perforatedai import utils_perforatedai as UPA
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 parser = argparse.ArgumentParser(description='Running custom PyTorch models in Edge Impulse')
+"""
 
 # Data / run args
 parser.add_argument('--data-directory', type=str, default='data')
@@ -30,17 +31,61 @@ parser.add_argument('--noise_std', type=float, default=0, help="Gaussian noise s
 parser.add_argument('--channel_growth_mode', type=int, default=3, choices=[0,1,2,3,4,5])
 parser.add_argument('--dendritic-optimization', type=str, required=False, default="false")
 #Only show if dendritic optimization is checked
-parser.add_argument('--switch_speed', type=str, default='slow', help="speed to switch", choices=['slow', 'medium', 'fast']) # CHANGED
-parser.add_argument('--max_dendrites', type=int, default=3) # CHANGED
+parser.add_argument('--switch_speed', type=str, default='slow', help="speed to switch", choices=['slow', 'medium', 'fast'])
+parser.add_argument('--max_dendrites', type=int, default=3)
 parser.add_argument('--improvement_threshold', type=str, default='low', choices=['high', 'medium', 'low'])
 parser.add_argument('--dendrite_weight_initialization_multiplier', type=float, default=0.01)
 parser.add_argument('--dendrite_forward_function', type=str, default='tanh', choices=['relu','sigmoid','tanh'], help="0=sigmoid,1=relu,2=tanh")
 parser.add_argument('--dendrite-conversion', type=str, default='All Layers', choices=['Linear Only','All Layers'])
 parser.add_argument('--improved-dendritic-optimization', type=str, required=False, default="false")
 #Only show if improved is checked
-parser.add_argument('--perforated-ai-token', type=str, required=False, default="false")
+parser.add_argument('--perforated-ai-token', type=str, required=False, default="")
+
+
+
+
+
+
+"""
+# Data / run args
+parser.add_argument('--data-directory', type=str, default='data')
+parser.add_argument('--out-directory', type=str, default='out')
+
+# Baseline arguments to always show
+parser.add_argument('--epochs', type=int, default=100)
+parser.add_argument('--batch_size', type=int, default=32)
+parser.add_argument('--learning-rate', type=float, default = 0.001)
+parser.add_argument('--seed', type=int, default=0)
+parser.add_argument('--dropout', type=float, default=0.1)
+parser.add_argument('--num_conv', type=int, default=3, choices=[1,2,3])
+parser.add_argument('--num_linear', type=int, default=2, choices=[1,2])
+parser.add_argument('--network_width', type=float, default=2, help="Width multiplier for channels")
+parser.add_argument('--noise_std', type=float, default=0, help="Gaussian noise stddev during training")
+parser.add_argument('--channel_growth_mode', type=int, default=5, choices=[0,1,2,3,4,5])
+parser.add_argument('--dendritic-optimization', type=str, required=False, default="false")
+#Only show if dendritic optimization is checked
+parser.add_argument('--switch_speed', type=str, default='slow', help="speed to switch", choices=['slow', 'medium', 'fast'])
+parser.add_argument('--max_dendrites', type=int, default=3)
+parser.add_argument('--improvement_threshold', type=str, default='medium', choices=['high', 'medium', 'low'])
+parser.add_argument('--dendrite_weight_initialization_multiplier', type=float, default=0.01)
+parser.add_argument('--dendrite_forward_function', type=str, default='tanh', choices=['relu','sigmoid','tanh'], help="0=sigmoid,1=relu,2=tanh")
+parser.add_argument('--dendrite-conversion', type=str, default='All Layers', choices=['Linear Only','All Layers'])
+parser.add_argument('--improved-dendritic-optimization', type=str, required=False, default="false")
+#Only show if improved is checked
+parser.add_argument('--perforated-ai-token', type=str, required=False, default="")
+
+
+
+
+
+
 
 args, unknown = parser.parse_known_args()
+
+
+os.environ["PAIEMAIL"] = "user@edgeimpulse.com"
+os.environ["PAITOKEN"] = args.perforated_ai_token
+
 
 if not os.path.exists(args.out_directory):
     os.makedirs(args.out_directory, exist_ok=True)
@@ -295,7 +340,7 @@ def main(config):
     GPA.pc.set_candidate_weight_initialization_multiplier(
         args.dendrite_weight_initialization_multiplier
     )
-    if args.dendrite_forward_function == 'sidmoid':
+    if args.dendrite_forward_function == 'sigmoid':
         pai_forward_function = torch.sigmoid
     elif args.dendrite_forward_function == 'relu':
         pai_forward_function = torch.relu
@@ -310,13 +355,16 @@ def main(config):
         GPA.pc.set_modules_to_track([nn.Conv2d])
         
     if not str2bool(args.dendritic_optimization):
+        print('building without dendrites')
         GPA.pc.set_max_dendrites(0)
     else:
+        print('building with dendrites')
         GPA.pc.set_max_dendrites(args.max_dendrites)
     if not str2bool(args.improved_dendritic_optimization):
         GPA.pc.set_perforated_backpropagation(False)
         GPA.pc.set_dendrite_update_mode(True)
     else:
+        print('building with improved dendrites')
         GPA.pc.set_perforated_backpropagation(True)
         GPA.pc.set_dendrite_update_mode(True)
     GPA.pc.set_initial_correlation_batches(40)
@@ -423,6 +471,9 @@ def main(config):
 
     first_test_loss = 0
     first_test_acc = 0
+    first_val_loss = 0
+    first_val_acc = 0
+    first_param_count = UPA.count_params(model)
     # Training loop
     epoch = -1
 
@@ -434,6 +485,7 @@ def main(config):
 
 
         GPA.pai_tracker.add_extra_score(train_acc, 'Train')
+        GPA.pai_tracker.add_extra_score(test_acc, 'Test')
         model, restructured, training_complete = GPA.pai_tracker.add_validation_score(val_acc, model)
         model.to(device)
         if(training_complete):
@@ -442,7 +494,9 @@ def main(config):
             if(first_test_loss == 0):
                 first_test_loss = test_loss
                 first_test_acc = test_acc
-
+                first_val_loss = val_loss
+                first_val_acc = val_acc
+                
 
             print('Restructured dendritic architecture')
             optimArgs = {'params':model.parameters(),
@@ -459,12 +513,16 @@ def main(config):
 
 
     test_loss, test_acc = test(model, test_loader, criterion, device)
-    print(f'Final Epoch {epoch+1} '
-            f'Test Loss: {test_loss:.4f}, Test Acc: {test_acc:.4f} | '
-            f'Dendrite Count and Mode: {GPA.pai_tracker.member_vars["num_dendrites_added"]}'
-            f' - {GPA.pai_tracker.member_vars["mode"]}')
-    print(f'Without Dendrites: '
-            f'Test Loss: {first_test_loss:.4f}, Test Acc: {first_test_acc:.4f}')
+    print(f'First architecture: '
+            f'Val Acc: {first_val_acc:.4f}, Test Acc: {first_test_acc:.4f}, params: {first_param_count}')
+
+    print(f'Final architecture: '
+            f'Val Acc: {val_acc:.4f}, Test Acc: {test_acc:.4f}, params: {UPA.count_params(model)} '
+            f'Dendrite Count: {GPA.pai_tracker.member_vars["num_dendrites_added"]}')
+
+    print(f'Reduction in misclassifications because of dendrites')
+    print(f'Validation: {(100.0*((val_acc-first_val_acc)/(1-first_val_acc))):.2f}%')
+    print(f'Test: {(100.0*((test_acc-first_test_acc)/(1-first_test_acc))):.2f}%')
 
     from perforatedbp import network_pbp as PBN
     model = AudioClassifier(input_length, classes, num_conv=args.num_conv, num_linear=args.num_linear, width=args.network_width, linear_dropout=args.dropout, noise_std=args.noise_std, growth_mode=args.channel_growth_mode).to(device)
@@ -489,7 +547,6 @@ def main(config):
                 
                 # Set the explicit padding
                 conv.padding = padding
-                print(f"Updated padding for conv_blocks[{i}][0].main_module to {padding}")
 
     # If some forward_pre_hooks still exist and might mutate weights, remove them before exporting as a quick fallback:
     # for h in getattr(model, 'conv_hooks', []):
@@ -500,7 +557,7 @@ def main(config):
 
     torch.onnx.export(model.cpu(),
                   torch.randn((32, 624)),
-                  'PAI/model.onnx',
+                  os.path.join(args.out_directory, 'model.onnx'),
                   export_params=True,
                   opset_version=10,
                   do_constant_folding=True,
