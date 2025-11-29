@@ -10,15 +10,35 @@ RANDOM_SEED = 3
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
-# Load files
+# Load files and take in parameters
 parser = argparse.ArgumentParser(description='Running custom PyTorch models in Edge Impulse')
+
 parser.add_argument('--data-directory', type=str, required=True)
-parser.add_argument('--epochs', type=int, required=True)
-parser.add_argument('--learning-rate', type=float, required=True)
-parser.add_argument('--dendritic-optimization', type=str, required=False, default="false")
-parser.add_argument('--improved-dendritic-optimization', type=str, required=False, default="false")
-parser.add_argument('--perforated-ai-token', type=str, required=False, default="false")
 parser.add_argument('--out-directory', type=str, required=True)
+
+parser.add_argument('--epochs', type=int, default=100, required=True)
+parser.add_argument('--batch-size', type=int, default=32, required=True)
+parser.add_argument('--learning-rate', type=float, default=0.01, required=True)
+parser.add_argument('--seed', type=int, default=0, required=True)
+parser.add_argument('--dropout', type=float, default=0.3, required=True)
+
+parser.add_argument('--num-conv', type=int, default=3, choices=[1,2,3], required=True)
+parser.add_argument('--num-linear', type=int, default=1, choices=[1,2], required=True)
+parser.add_argument('--network-width', type=float, default=0.5, help="Width multiplier for channels.", required=True)
+parser.add_argument('--noise-std', type=float, default=0.0, help="Gaussian noise stddev during training.", required=True)
+parser.add_argument('--channel-growth-mode', type=int, default=3, choices=[0,1,2,3,4,5], required=True)
+
+parser.add_argument('--dendritic-optimization', type=str, default="false")
+parser.add_argument('--switch-speed', type=str, default='fast', help="Controls the speed to switch.", choices=['slow', 'medium', 'fast'])
+parser.add_argument('--max-dendrites', type=int, default=2)
+parser.add_argument('--improvement_threshold', type=str, default="low", choices=['high', 'medium', 'low'])
+parser.add_argument('--dendrite_weight_initialization_multiplier', type=float, default=0.01)
+parser.add_argument('--dendrite_forward_function', type=str, default='tanh', choices=['relu','sigmoid','tanh'], help="0=sigmoid,1=relu,2=tanh")
+parser.add_argument('--dendrite-conversion', type=str, default="All Layers", choices=['Linear Only','All Layers'])
+
+parser.add_argument('--improved-dendritic-optimization', type=str, default="")
+parser.add_argument('--perforated-ai-token', type=str, default="")
+
 
 args, unknown = parser.parse_known_args()
 
