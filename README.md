@@ -14,6 +14,20 @@ This project first explored the improvements dendritic optimization could acheiv
 
 For details on our experiments please view the [W&B report](https://wandb.ai/perforated-ai/Dendritic%20Edge%20Impulse%20Audio%20-%20Combo/reports/Edge-Impulse-Keyword-Spotting--VmlldzoxNTIxNjE5Ng?accessToken=3lm4jm5f9npsu45vs180ybo6150ed4gnhos9rrkk6seqb4bmf458me28seynu0xb) of the 800 trials we ran sweeping over hyperparameters for this application.
 
-## This repository
+## This Repository
 
 This repository replaces the original PyTorch script from the original PyTorch example block with our custom script.  It updates the hyperparameter settings to enable users to experiment with all of the hyperparameters we swept over.  It also compiles the final dendritic models in ONNX format to be used ine exactly the same way as the old block.  This is a plug and play Impulse Block allowing users to use dendritic optimization on any Edge Impulse project which uses audio data.  As an open source project it enables users to make required adjustments to work with additional data formants.  Additionally, by working together with the Edge Impulse team this block shows a starting point to extend the default Edge Impulse NN classifier block with dendritic optimization, empowering all Edge Impulse users to acheive improved outcomes on any proejct, by clocking a single checkbox.
+
+### Files to Review
+
+#### train.py
+
+train.py is the main training script which receives input parameters from the block, loads the dataset, traings the model, and outputs the onnx file.  This is the main training script which gets used to train dendritic optimized networks.
+
+#### parameters.json
+
+parameters.json is the json file instructing the Impulse Block what parameters to display to a user to adjust settings for the neural network training.
+
+#### Other Files
+
+No other files require review.  They either are the original files from the original PyTorch example block repository or they are simply additional files in case future users would also like to do their own W&B sweeps, inferencing, or other experiments we found useful along the way.  These files are not used in the compiled block.
