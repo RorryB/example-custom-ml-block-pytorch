@@ -31,9 +31,9 @@ parser.add_argument('--channel-growth-mode', type=int, default=3, choices=[0,1,2
 parser.add_argument('--dendritic-optimization', type=str, default="false")
 parser.add_argument('--switch-speed', type=str, default='fast', help="Controls the speed to switch.", choices=['slow', 'medium', 'fast'])
 parser.add_argument('--max-dendrites', type=int, default=2)
-parser.add_argument('--improvement_threshold', type=str, default="low", choices=['high', 'medium', 'low'])
-parser.add_argument('--dendrite_weight_initialization_multiplier', type=float, default=0.01)
-parser.add_argument('--dendrite_forward_function', type=str, default='tanh', choices=['relu','sigmoid','tanh'], help="0=sigmoid,1=relu,2=tanh")
+parser.add_argument('--improvement-threshold', type=str, default="low", choices=['high', 'medium', 'low'])
+parser.add_argument('--dendrite-weight-initialization-multiplier', type=float, default=0.01)
+parser.add_argument('--dendrite-forward-function', type=str, default='tanh', choices=['relu','sigmoid','tanh'], help="0=sigmoid,1=relu,2=tanh")
 parser.add_argument('--dendrite-conversion', type=str, default="All Layers", choices=['Linear Only','All Layers'])
 
 parser.add_argument('--improved-dendritic-optimization', type=str, default="")
