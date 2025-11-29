@@ -46,15 +46,17 @@
             "name": "Number of Convolutions",
             "value": "3",
             "type": "select",
-            "param": "num-conv",
-            "valid": ["1", "2", "3"]
+            "valid": ["1", "2", "3"],
+            "configType": "int",
+            "param": "num-conv"
         },
         {
             "name": "Number of Linear Layers",
             "value": "1",
             "type": "select",
-            "param": "num-linear",
-            "valid": ["1", "2"]
+            "valid": ["1", "2"],
+            "configType": "int",
+            "param": "num-linear"
         },
         {
             "name": "Network Width",
@@ -74,8 +76,8 @@
             "name": "Channel Growth Mode",
             "value": "3",
             "type": "select",
-            "param": "channel-growth-mode",
-            "valid": ["0", "1", "2", "3", "4", "5"]
+            "valid": ["0", "1", "2", "3", "4", "5"],
+            "param": "channel-growth-mode"
         },
         {
             "name": "Dendritic Optimization",
