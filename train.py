@@ -62,10 +62,9 @@ print('')
 def str2bool(value: str) -> bool:
     return str(value).lower() in ("1", "true", "t", "yes", "y")
 
-# INFO: Here are the values of dendritic optimization flags from the GUI
-dendritic_optimization = str2bool(args.dendritic_optimization)
-improved_dendritic_optimization = str2bool(args.improved_dendritic_optimization)
-perforated_ai_token = args.perforated_ai_token
+# Is needed because EdgeImpulse will pass in strings for boolean args
+args.dendritic_optimization = str2bool(args.dendritic_optimization)
+args.improved_dendritic_optimization = str2bool(args.improved_dendritic_optimization)
 
 # Small pyTorch neural network with 2 hidden layers
 class Net(nn.Module):
