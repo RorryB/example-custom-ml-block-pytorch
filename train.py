@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
-import torchaudio.transforms as T
 import numpy as np
 import argparse, os, sys, random, logging, time, json
 
@@ -510,19 +509,23 @@ def main(config):
             f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f} | '
             f'Dendrite Count and Mode: {GPA.pai_tracker.member_vars["num_dendrites_added"]}'
             f' - {GPA.pai_tracker.member_vars["mode"]}')
-
-
+    
     test_loss, test_acc = test(model, test_loader, criterion, device)
-    print(f'First architecture: '
-            f'Val Acc: {first_val_acc:.4f}, Test Acc: {first_test_acc:.4f}, params: {first_param_count}')
+    if str2bool(args.dendritic_optimization):
+        print(f'First architecture: '
+                f'Val Acc: {first_val_acc:.4f}, Test Acc: {first_test_acc:.4f}, params: {first_param_count}')
 
-    print(f'Final architecture: '
-            f'Val Acc: {val_acc:.4f}, Test Acc: {test_acc:.4f}, params: {UPA.count_params(model)} '
-            f'Dendrite Count: {GPA.pai_tracker.member_vars["num_dendrites_added"]}')
+        print(f'Final architecture: '
+                f'Val Acc: {val_acc:.4f}, Test Acc: {test_acc:.4f}, params: {UPA.count_params(model)} '
+                f'Dendrite Count: {GPA.pai_tracker.member_vars["num_dendrites_added"]}')
 
-    print(f'Reduction in misclassifications because of dendrites')
-    print(f'Validation: {(100.0*((val_acc-first_val_acc)/(1-first_val_acc))):.2f}%')
-    print(f'Test: {(100.0*((test_acc-first_test_acc)/(1-first_test_acc))):.2f}%')
+        print(f'Reduction in misclassifications because of dendrites')
+        print(f'Validation: {(100.0*((val_acc-first_val_acc)/(1-first_val_acc))):.2f}%')
+        print(f'Test: {(100.0*((test_acc-first_test_acc)/(1-first_test_acc))):.2f}%')
+    else:
+        print(f'Final architecture: '
+        f'Val Acc: {val_acc:.4f}, Test Acc: {test_acc:.4f}, params: {UPA.count_params(model)} '
+        f'Dendrite Count: {GPA.pai_tracker.member_vars["num_dendrites_added"]}')
 
     from perforatedbp import network_pbp as PBN
     model = AudioClassifier(input_length, classes, num_conv=args.num_conv, num_linear=args.num_linear, width=args.network_width, linear_dropout=args.dropout, noise_std=args.noise_std, growth_mode=args.channel_growth_mode).to(device)
