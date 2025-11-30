@@ -1,99 +1,33 @@
-# Custom PyTorch ML block example for Edge Impulse
+# Dendritic NN Block for Edge Impulse
 
-This repository is an example on how to [add a custom learning block](https://docs.edgeimpulse.com/docs/edge-impulse-studio/learning-blocks/adding-custom-learning-blocks) to Edge Impulse. This repository contains a small fully-connected model built in PyTorch. If you want to see a more complex PyTorch example, see [edgeimpulse/yolov5](https://github.com/edgeimpulse/yolov5). Or if you're looking for the Keras example, see [edgeimpulse/example-custom-ml-block-keras](https://github.com/edgeimpulse/example-custom-ml-block-keras).
+This repository implements a neural network block for Edge Impulse which leverages dendritic optimization. To see details on how to compile and push this block to Edge Impulse, follow the instructions from the [original repository](https://github.com/edgeimpulse/example-custom-ml-block-pytorch/tree/master). This block was created for the 2025 Edge Impulse Hackathon. A submission video describing the project is available.
 
-As a primer, read the [Custom learning blocks](https://docs.edgeimpulse.com/docs/edge-impulse-studio/learning-blocks/adding-custom-learning-blocks) page in the Edge Impulse docs.
+## What is Dendritic Optimization?
 
-## Running the pipeline
+The original artificial neuron was proposed in 1943, drawing on neuroscience research dating back to the 1860s. Since then, backpropagation was introduced, and there have been significant advances in hardware, optimizers, data curation, and architectures, while the core building block has remained fundamentally the same. Interestingly, for 70 of the last 80 years, neuroscience continued to support this original design. However, modern neuroscience now understands that the perceptron misses a critical piece of biological intelligence: the decision-making performed by a neuron's dendrites. Dendritic optimization leverages these ideas to augment artificial neurons with dendrite nodes, enabling practitioners to achieve smarter, smaller, and cheaper models on the same datasets. For further details about this research, a selection of papers can be found [here](https://github.com/PerforatedAI/PerforatedAI/tree/main/Papers).
 
-You run this pipeline via Docker. This encapsulates all dependencies and packages for you.
+## This Project
 
-### Running via Docker
+This project first explored the improvements dendritic optimization could achieve on the model in the [keyword spotting tutorial](https://docs.edgeimpulse.com/tutorials/end-to-end/keyword-spotting), and then created a public Edge Impulse block to enable anyone to leverage this capability on their own Edge Impulse projects. 
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-2. Install the [Edge Impulse CLI](https://docs.edgeimpulse.com/docs/edge-impulse-cli/cli-installation) v1.16.0 or higher.
-3. Create a new Edge Impulse project, and add data from the [continuous gestures](https://docs.edgeimpulse.com/docs/continuous-gestures) dataset.
-4. Under **Create impulse** add a 'Spectral features' processing block, and a random ML block.
-5. Open a command prompt or terminal window.
-6. Initialize the block:
+## Our Experiments
 
-    ```
-    $ edge-impulse-blocks init
-    ```
+For details on our experiments, please view the [W&B report](https://wandb.ai/perforated-ai/Dendritic%20Edge%20Impulse%20Audio%20-%20Combo/reports/Edge-Impulse-Keyword-Spotting--VmlldzoxNTIxNjE5Ng?accessToken=3lm4jm5f9npsu45vs180ybo6150ed4gnhos9rrkk6seqb4bmf458me28seynu0xb) of the 800 trials we ran while sweeping hyperparameters for this application.
 
-7. Fetch new data via:
+## This Repository
 
-    ```
-    $ edge-impulse-blocks runner --download-data data/
-    ```
+This repository replaces the PyTorch script from the example PyTorch block with our custom script. It updates the hyperparameter settings to enable users to experiment with all of the hyperparameters we swept over. It also compiles the final dendritic models in ONNX format to be used in exactly the same way as the original block. This is a plug-and-play Impulse Block allowing users to use dendritic optimization on any Edge Impulse project that uses audio data. As an open-source project, it enables users to make required adjustments to work with additional data formats. Additionally, working with the Edge Impulse team, this block provides a starting point to extend the default Edge Impulse NN Classifier block with dendritic optimization, empowering all Edge Impulse users to achieve improved outcomes on any project by checking a single checkbox.
 
-8. Build the container:
+### Files to Review
 
-    ```
-    $ docker build -t custom-ml-pytorch .
-    ```
+#### train.py
 
-9. Run the container to test the script (you don't need to rebuild the container if you make changes):
+train.py is the main training script which receives input parameters from the block, loads the dataset, trains the model, and outputs the ONNX file. This is the main training script used to train dendritic-optimized networks.
 
-    **macOS, Linux**
+#### parameters.json
 
-    ```
-    $ docker run --rm -v $PWD:/app custom-ml-pytorch --data-directory /app/data --epochs 30 --learning-rate 0.01 --out-directory out/
-    ```
+parameters.json is the JSON file that instructs the Impulse Block which parameters to display to users for adjusting neural network training settings.
 
-    **Windows (Command prompt)**
+#### Other Files
 
-    ```
-    $ docker run --rm -v "%cd%":/app custom-ml-pytorch --data-directory /app/data --epochs 30 --learning-rate 0.01 --out-directory out/
-    ```
-
-    **Windows (Powershell)**
-
-    ```
-    $ docker run --rm -v ${PWD}$:/app custom-ml-pytorch --data-directory /app/data --epochs 30 --learning-rate 0.01 --out-directory out/
-    ```
-
-10. This creates an .onnx file in the 'out' directory.
-
-#### Adding extra dependencies
-
-If you have extra packages that you want to install within the container, add them to `requirements.txt` and rebuild the container.
-
-#### Adding new arguments
-
-To add new arguments, see [Custom learning blocks > Arguments to your script](https://docs.edgeimpulse.com/docs/edge-impulse-studio/learning-blocks/adding-custom-learning-blocks#arguments-to-your-script).
-
-## Fetching new data
-
-To get up-to-date data from your project:
-
-1. Install the [Edge Impulse CLI](https://docs.edgeimpulse.com/docs/edge-impulse-cli/cli-installation) v1.16 or higher.
-2. Open a command prompt or terminal window.
-3. Fetch new data via:
-
-    ```
-    $ edge-impulse-blocks runner --download-data data/
-    ```
-
-## Pushing the block back to Edge Impulse
-
-You can also push this block back to Edge Impulse, that makes it available like any other ML block so you can retrain your model when new data comes in, or deploy the model to device. See [Docs > Adding custom learning blocks](https://docs.edgeimpulse.com/docs/edge-impulse-studio/organizations/adding-custom-transfer-learning-models) for more information.
-
-1. Push the block:
-
-    ```
-    $ edge-impulse-blocks push
-    ```
-
-2. The block is now available under any of your projects via **Create impulse > Add new learning block**.
-
-## Changing the block type (e.g. image classification, object detection or regression)
-
-If you want to change the block type because you're classifying a different data type, or build a model with a different output format, run:
-
-```
-$ rm parameters.json  .ei-block-config
-$ edge-impulse-blocks init
-```
-
-And answer the wizard. This'll create a new parameters.json file.
+No other files require review. They are either the original files from the PyTorch example block repository or additional files for users who want to run their own W&B sweeps, perform inference, or run other experiments we found useful along the way. These files are not used in the compiled block.
