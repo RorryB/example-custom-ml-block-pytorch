@@ -1,5 +1,5 @@
 numpy==1.22.2
 onnx==1.8.1
-torch==1.11.0
+torch==2.6.0
 perforatedai==3.0.4
 perforatedbp==3.0.4

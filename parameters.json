@@ -2,8 +2,8 @@
     "version": 1,
     "type": "machine-learning",
     "info": {
-        "name": "PyTorch MLP w/ CUDA",
-        "description": "Test w/ cuda drivers",
+        "name": "Dendritic NN Block",
+        "description": "Dendritic NN Block.",
         "operatesOn": "other",
         "indRequiresGpu": false,
         "repositoryUrl": "https://github.com/edgeimpulse/example-custom-ml-block-pytorch"
@@ -192,6 +192,11 @@
             "value": "false",
             "type": "boolean",
             "help": "Controls whether improved dendritic optimization should be applied.",
+            "showIf": {
+                "parameter": "dendritic-optimization",
+                "operator": "eq",
+                "value": "true"
+            },
             "param": "improved-dendritic-optimization"
         },
         {
