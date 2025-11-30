@@ -2,8 +2,8 @@
     "version": 1,
     "type": "machine-learning",
     "info": {
-        "name": "PyTorch MLP w/ CUDA",
-        "description": "Test w/ cuda drivers",
+        "name": "Dendritic NN Block",
+        "description": "Dendritic NN Block.",
         "operatesOn": "other",
         "indRequiresGpu": false,
         "repositoryUrl": "https://github.com/edgeimpulse/example-custom-ml-block-pytorch"
@@ -46,7 +46,11 @@
             "name": "Number of Convolutions",
             "value": "3",
             "type": "select",
-            "valid": ["1", "2", "3"],
+            "valid": [
+                "1",
+                "2",
+                "3"
+            ],
             "configType": "int",
             "param": "num-conv"
         },
@@ -54,7 +58,10 @@
             "name": "Number of Linear Layers",
             "value": "2",
             "type": "select",
-            "valid": ["1", "2"],
+            "valid": [
+                "1",
+                "2"
+            ],
             "configType": "int",
             "param": "num-linear"
         },
@@ -76,7 +83,14 @@
             "name": "Channel Growth Mode",
             "value": "5",
             "type": "select",
-            "valid": ["0", "1", "2", "3", "4", "5"],
+            "valid": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ],
             "configType": "int",
             "param": "channel-growth-mode"
         },
@@ -92,7 +106,11 @@
             "value": "slow",
             "type": "select",
             "help": "Controls the speed to switch.",
-            "valid": ["slow", "medium", "fast"],
+            "valid": [
+                "slow",
+                "medium",
+                "fast"
+            ],
             "showIf": {
                 "parameter": "dendritic-optimization",
                 "operator": "eq",
@@ -115,7 +133,11 @@
             "name": "Improvement Threshold",
             "value": "medium",
             "type": "select",
-            "valid": ["low", "medium", "high"],
+            "valid": [
+                "low",
+                "medium",
+                "high"
+            ],
             "showIf": {
                 "parameter": "dendritic-optimization",
                 "operator": "eq",
@@ -138,7 +160,11 @@
             "name": "Dendrite Forward Function",
             "value": "tanh",
             "type": "select",
-            "valid": ["relu", "sigmoid", "tanh"],
+            "valid": [
+                "relu",
+                "sigmoid",
+                "tanh"
+            ],
             "showIf": {
                 "parameter": "dendritic-optimization",
                 "operator": "eq",
@@ -150,7 +176,10 @@
             "name": "Dendrite Conversion",
             "value": "All Layers",
             "type": "select",
-            "valid": ["Linear Only", "All Layers"],
+            "valid": [
+                "Linear Only",
+                "All Layers"
+            ],
             "showIf": {
                 "parameter": "dendritic-optimization",
                 "operator": "eq",
@@ -163,6 +192,11 @@
             "value": "false",
             "type": "boolean",
             "help": "Controls whether improved dendritic optimization should be applied.",
+            "showIf": {
+                "parameter": "dendritic-optimization",
+                "operator": "eq",
+                "value": "true"
+            },
             "param": "improved-dendritic-optimization"
         },
         {

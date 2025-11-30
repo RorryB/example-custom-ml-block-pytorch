@@ -12,7 +12,6 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 parser = argparse.ArgumentParser(description='Running custom PyTorch models in Edge Impulse')
 """
-
 # Data / run args
 parser.add_argument('--data-directory', type=str, default='data')
 parser.add_argument('--out-directory', type=str, default='out')
@@ -39,12 +38,6 @@ parser.add_argument('--dendrite-conversion', type=str, default='All Layers', cho
 parser.add_argument('--improved-dendritic-optimization', type=str, required=False, default="false")
 #Only show if improved is checked
 parser.add_argument('--perforated-ai-token', type=str, required=False, default="")
-
-
-
-
-
-
 """
 # Data / run args
 parser.add_argument('--data-directory', type=str, default='data')
@@ -62,7 +55,8 @@ parser.add_argument('--network_width', type=float, default=2, help="Width multip
 parser.add_argument('--noise_std', type=float, default=0, help="Gaussian noise stddev during training")
 parser.add_argument('--channel_growth_mode', type=int, default=5, choices=[0,1,2,3,4,5])
 parser.add_argument('--dendritic-optimization', type=str, required=False, default="false")
-#Only show if dendritic optimization is checked
+
+# Only show if dendritic optimization is checked
 parser.add_argument('--switch_speed', type=str, default='slow', help="speed to switch", choices=['slow', 'medium', 'fast'])
 parser.add_argument('--max_dendrites', type=int, default=3)
 parser.add_argument('--improvement_threshold', type=str, default='medium', choices=['high', 'medium', 'low'])
@@ -70,25 +64,17 @@ parser.add_argument('--dendrite_weight_initialization_multiplier', type=float, d
 parser.add_argument('--dendrite_forward_function', type=str, default='tanh', choices=['relu','sigmoid','tanh'], help="0=sigmoid,1=relu,2=tanh")
 parser.add_argument('--dendrite-conversion', type=str, default='All Layers', choices=['Linear Only','All Layers'])
 parser.add_argument('--improved-dendritic-optimization', type=str, required=False, default="false")
-#Only show if improved is checked
+
+# Only show if improved is checked
 parser.add_argument('--perforated-ai-token', type=str, required=False, default="")
 
-
-
-
-
-
-
 args, unknown = parser.parse_known_args()
-
 
 os.environ["PAIEMAIL"] = "user@edgeimpulse.com"
 os.environ["PAITOKEN"] = args.perforated_ai_token
 
-
 if not os.path.exists(args.out_directory):
     os.makedirs(args.out_directory, exist_ok=True)
-
 
 def str2bool(value: str) -> bool:
     return str(value).lower() in ("1", "true", "t", "yes", "y")
