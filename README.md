@@ -20,9 +20,9 @@ This repository replaces the PyTorch script from the example PyTorch block with 
 
 ### Files to Review
 
-#### train.py
+#### train2.py
 
-train.py is the main training script which receives input parameters from the block, loads the dataset, trains the model, and outputs the ONNX file. This is the main training script used to train dendritic-optimized networks.
+train2.py is the main training script which receives input parameters from the block, loads the dataset, trains the model, and outputs the ONNX file. This is the main training script used to train dendritic-optimized networks.
 
 #### parameters.json
 
