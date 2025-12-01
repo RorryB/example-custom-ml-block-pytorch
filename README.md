@@ -31,3 +31,9 @@ parameters.json is the JSON file that instructs the Impulse Block which paramete
 #### Other Files
 
 No other files require review. They are either the original files from the PyTorch example block repository or additional files for users who want to run their own W&B sweeps, perform inference, or run other experiments we found useful along the way. These files are not used in the compiled block.
+
+### Current Deployment Issues
+
+ - We output a model file in onnx format that seems to be able to be run by Edge Impulse, but the accuracy it generates is much lower than our reported accuracy both for dendritic models and traditional models.  We suspect that a post processing step between onnx and the final format is causing issues, but would need to work with the Edge Impulse team to get to the bottom of exactly what is causing this.
+
+ - Vishy is able to adjust the parameters of the dendritic trainer in his project, but when the proejct it cloned it seems like the parameters may not actually be getting read by the training script in the clones so default settings are used each time.
