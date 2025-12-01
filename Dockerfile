@@ -30,9 +30,11 @@ RUN apt update && apt install -y protobuf-compiler
 RUN python3 -m pip install --upgrade pip setuptools wheel
 
 COPY requirements.txt ./
+
 RUN pip3 install -r requirements.txt
 
-RUN pip3 install "protobuf==3.20.*"
+RUN pip3 install tf_keras
 
 COPY . ./
-ENTRYPOINT ["python3", "-u", "train.py"]
+ENTRYPOINT ["python3", "-u", "train2.py"]
+

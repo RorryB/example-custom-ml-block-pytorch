@@ -363,7 +363,7 @@ def main(config):
             schedArgs = {'mode':'max', 'patience': 5}
             optimizer, PAIscheduler = GPA.pai_tracker.setup_optimizer(model, optimArgs, schedArgs)
 
-        print(f'Epoch {epoch+1} Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f} | Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f} | Dendrite Count and Mode: {GPA.pai_tracker.member_vars["num_dendrites_added"]} - {GPA.pai_tracker.member_vars["mode"]}')
+        print(f'Epoch {epoch+1} Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f} | Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f} | Dendrite Count and Mode: {GPA.pai_tracker.member_vars.get("num_dendrites_added", "N/A")}')
 
     test_loss, test_acc = test(model, test_loader, criterion, device)
 
@@ -380,14 +380,14 @@ def main(config):
     # Save/export for Edge Impulse
     # -------------------------
     from perforatedbp import network_pbp as PBN
-    model = AudioClassifier(input_length, classes, num_conv=args.num_conv, num_linear=args.num_linear, width=args.network_width, linear_dropout=args.dropout, noise_std=args.noise_std, growth_mode=args.channel_growth_mode).to(device)
+    model = AudioClassifier(input_length, classes, num_conv=args.num_conv, num_linear=args.num_linear, width=args.network_width, linear_dropout=args.dropout, noise_std=args.noise_std, growth_mode=args.channel_growth_mode)
 
     if not str2bool(args.improved_dendritic_optimization):
         from perforatedbp import utils_pbp as PBU
         model = UPA.initialize_pai(model)
         model = UPA.load_system(model, 'PAI', 'best_model', True)
         PBU.pb_save_net(model,'PAI','best_model')
-        model = AudioClassifier(input_length, classes, num_conv=args.num_conv, num_linear=args.num_linear, width=args.network_width, linear_dropout=args.dropout, noise_std=args.noise_std, growth_mode=args.channel_growth_mode).to(device)
+        model = AudioClassifier(input_length, classes, num_conv=args.num_conv, num_linear=args.num_linear, width=args.network_width, linear_dropout=args.dropout, noise_std=args.noise_std, growth_mode=args.channel_growth_mode)
 
     model = PBN.load_pai_model(model, 'PAI/best_model_pai.pt')
     for i, block in enumerate(model.conv_blocks):
@@ -496,21 +496,60 @@ def main(config):
             out_dim = None
             try:
                 test_inp = tf.constant(np.zeros((1, int(input_length) if 'input_length' in locals() else 624), dtype=np.float32))
+                # Call backend and be robust to different return types (Tensor, np.array, dict, tuple, list, etc.)
                 try:
                     test_out = backend_fn(test_inp)
                 except Exception:
+                    # Some callables may succeed but raise on first call signature; try a gentle fallback
                     try:
-                        test_out = list(backend_fn(test_inp).values())[0]
+                        maybe = backend_fn(test_inp)
+                        test_out = maybe
                     except Exception:
                         test_out = None
-                if test_out is not None:
-                    to = tf.convert_to_tensor(test_out)
-                    out_shape = to.shape
-                    if len(out_shape) >= 2:
-                        out_dim = int(out_shape[-1])
+
+                # Normalize outputs: flatten nested structures (dict/list/tuple) and pick first element if needed
+                try:
+                    flat_outputs = tf.nest.flatten(test_out)
+                    if flat_outputs:
+                        candidate = flat_outputs[0]
                     else:
-                        out_dim = int(out_shape[0])
-                    print("[compat-shim] Detected output dim:", out_dim)
+                        candidate = None
+                except Exception:
+                    # tf.nest.flatten may throw if test_out is None or unexpected; fall back to simple checks
+                    if isinstance(test_out, dict):
+                        vals = list(test_out.values())
+                        candidate = vals[0] if vals else None
+                    elif isinstance(test_out, (list, tuple)):
+                        candidate = test_out[0] if test_out else None
+                    else:
+                        candidate = test_out
+
+                if candidate is not None:
+                    # Ensure candidate is a tensor-like object we can inspect
+                    try:
+                        to = tf.convert_to_tensor(candidate)
+                    except Exception:
+                        # If candidate is a mapping (unlikely after flatten) attempt to get its first value
+                        if isinstance(candidate, dict):
+                            vals = list(candidate.values())
+                            if vals:
+                                to = tf.convert_to_tensor(vals[0])
+                            else:
+                                to = None
+                        else:
+                            to = None
+
+                    if to is not None:
+                        out_shape = to.shape
+                        if len(out_shape) >= 2:
+                            out_dim = int(out_shape[-1])
+                        else:
+                            out_dim = int(out_shape[0])
+                        print("[compat-shim] Detected output dim:", out_dim)
+                    else:
+                        print("[compat-shim] Candidate output not convertible to tensor; will use fallback.")
+                else:
+                    print("[compat-shim] No candidate output obtained from backend; will use fallback.")
             except Exception:
                 print("[compat-shim] Could not infer output dim; will use fallback if needed.")
                 traceback.print_exc()
