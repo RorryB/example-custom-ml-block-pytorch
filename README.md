@@ -1,6 +1,6 @@
 # Dendritic NN Block for Edge Impulse
 
-This repository implements a neural network block for Edge Impulse which leverages dendritic optimization. To see details on how to compile and push this block to Edge Impulse, follow the instructions from the [original repository](https://github.com/edgeimpulse/example-custom-ml-block-pytorch/tree/master). This block was created for the 2025 Edge Impulse Hackathon. A submission video describing the project is available [here](https://www.youtube.com/watch?v=ELMkR65PTgI&feature=youtu.be).
+This repository implements a neural network block for Edge Impulse which leverages dendritic optimization. To see details on how to compile and push this block to Edge Impulse, follow the instructions from the [original repository](https://github.com/edgeimpulse/example-custom-ml-block-pytorch/tree/master). This block was created for the 2025 Edge Impulse Hackathon. A submission video describing the project is available [here](https://drive.google.com/file/d/1vUdMBLijVm4c0Sq_RrBlrPgo-rGQZHWZ/view?usp=sharing).
 
 ## What is Dendritic Optimization?
 
