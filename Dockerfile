@@ -36,5 +36,5 @@ RUN pip3 install -r requirements.txt
 RUN pip3 install tf_keras
 
 COPY . ./
-ENTRYPOINT ["python3", "-u", "train2.py"]
+ENTRYPOINT ["python3", "-u", "train.py"]
 
